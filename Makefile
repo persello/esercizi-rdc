@@ -1,6 +1,6 @@
 .PHONY = all
 
-TARGETS = NA01.pdf NA02.pdf
+TARGETS = NA01.pdf NA02.pdf NA03.pdf
 
 all: $(TARGETS)
 
