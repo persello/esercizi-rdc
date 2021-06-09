@@ -9,8 +9,8 @@ header-includes:
             pdfborderstyle={/S/U/W 1}}
 ---
 
-Il codice sorgente degli esercizi si trova nella cartella `NSD01`.
-Gli esercizi vengono compilati (assieme alle relazioni PDF) mediante il comando `make`.
+Il codice sorgente degli esercizi si trova nella cartella `Esercizi/NSD01`.
+Gli esercizi vengono compilati mediante il comando `cmake`.
 
 \footnotesize
 La sorgente del documento è disponibile al seguente indirizzo: [https://github.com/persello/esercizi-rdc](https://github.com/persello/esercizi-rdc). Documento generato con [pandoc](https://pandoc.org).
