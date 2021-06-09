@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.0.0)
+project(Esercizi VERSION 0.1.0)
 
-project(Esercizi)
+include(CTest)
+enable_testing()
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output)
 
@@ -14,3 +16,7 @@ add_subdirectory(lib/udpsocketlib)
 
 # Executables
 add_subdirectory(NSD01/1_asta_telematica)
+
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
