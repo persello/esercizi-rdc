@@ -1,4 +1,16 @@
+/**
+ * @file server.c
+ * @author Riccardo Persello (riccardo.persello@icloud.com)
+ * @brief "Asta Telematica" server main.
+ * @version 0.1
+ * @date 2021-06-10
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "server_utilities.h"
+#include "constants.h"
 #include "utilities.h"
 
 #include <stdlib.h>
@@ -9,12 +21,6 @@
 #include <udpsocketlib.h>
 #include <liblog/log.h>
 
-#define DEFAULT_PORT 25000
-#define STARTING_PRICE 0.0
-
-#define OFFER_ACCEPTED_MSG "ACCETTATA"
-#define OFFER_INVALID_MSG "INVALIDA"
-#define OFFER_NOT_ACCEPTED_MSG "NON_ACCETTATA"
 
 void server_loop(int socket_handle)
 {

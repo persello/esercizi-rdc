@@ -1,3 +1,14 @@
+/**
+ * @file utilities.h
+ * @author Riccardo Persello (riccardo.persello@icloud.com)
+ * @brief Useful functions for both server and client programs.
+ * @version 0.1
+ * @date 2021-06-10
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #pragma once
 
 /**

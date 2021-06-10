@@ -1,3 +1,14 @@
+/**
+ * @file server_utilities.c
+ * @author Riccardo Persello (riccardo.persello@icloud.com)
+ * @brief Useful functions for "Asta Telematica" server.
+ * @version 0.1
+ * @date 2021-06-10
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "server_utilities.h"
 #include "utilities.h"
 

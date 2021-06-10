@@ -1,8 +1,19 @@
+/**
+ * @file client.c
+ * @author Riccardo Persello (riccardo.persello@icloud.com)
+ * @brief "Asta Telematica" client main.
+ * @version 0.1
+ * @date 2021-06-10
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
+#include "constants.h"
+
 #include <stdlib.h>
 
 #include <udpsocketlib.h>
-
-#define DEFAULT_PORT 25000
 
 /**
  * @brief Usage: asta_telematica_client [offerta] [nome] [server] <port>
