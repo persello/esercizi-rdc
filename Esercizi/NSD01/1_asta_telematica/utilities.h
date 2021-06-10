@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * @brief Closes the socket and then terminates the process.
  * 

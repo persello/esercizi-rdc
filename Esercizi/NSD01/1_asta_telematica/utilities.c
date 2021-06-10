@@ -2,7 +2,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
 #include <udpsocketlib.h>
+#include <liblog/log.h>
 
 /**
  * @brief Closes the socket and then terminates the process.
@@ -14,14 +16,14 @@ void die(int socket_handle, int status)
 {
     if (close_udp_socket(socket_handle))
     {
-        printf("Socket UDP %d chiuso.\n", socket_handle);
+        LOG_INFO("Socket UDP %d chiuso.", socket_handle);
     }
     else
     {
-        printf("Impossibile chiudere il socket UDP %d.\n", socket_handle);
+        LOG_ERROR("Impossibile chiudere il socket UDP %d.", socket_handle);
     }
 
-    printf("Processo terminato.\n");
+    LOG_INFO("Processo terminato.");
     exit(status);
 }
 
@@ -32,6 +34,6 @@ void die(int socket_handle, int status)
  */
 void error_handler(const char *message)
 {
-    printf("ERRORE: %s\n", message);
+    LOG_ERROR("%s", message);
     exit(EXIT_FAILURE);
 }

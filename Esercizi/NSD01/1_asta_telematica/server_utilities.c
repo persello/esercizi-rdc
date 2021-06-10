@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+
 #include <udpsocketlib.h>
+#include <liblog/log.h>
 
 /**
  * @brief Tries to reply to the latest command.
@@ -18,7 +20,7 @@ void try_reply(int socket_handle, char *message)
 {
     if (!udp_reply(socket_handle, message))
     {
-        printf("Impossibile rispondere al comando.");
+        LOG_ERROR("Impossibile rispondere al comando.");
         die(socket_handle, EXIT_FAILURE);
     }
 }
@@ -47,14 +49,15 @@ bool parse_command(char *command, char *name, double *value)
 
     // ----- Format check -----
 
-    // Start of command
+    // Start of command "OFFERTA NOME("
     if (strncmp(command, "OFFERTA NOME(", 13) != 0)
     {
         return false;
     }
 
-    // Capture name
     command += 13;
+
+    // Capture name (between parentheses)
     while (*command != ')' && *command != '\0')
     {
         *(name + name_index) = *command;
@@ -62,7 +65,7 @@ bool parse_command(char *command, char *name, double *value)
         name_index++;
     }
 
-    // Name termination
+    // Add name termination
     *(name + name_index) = '\0';
 
     // Check name length
@@ -77,20 +80,21 @@ bool parse_command(char *command, char *name, double *value)
         return false;
     }
 
-    // Check middle part
+    // Check middle part ") VALORE("
     if (strncmp(command, ") VALORE(", 9) != 0)
     {
         return false;
     }
 
-    // Capture value
     command += 9;
+
+    // Capture value
     if (sscanf(command, "%lf %n", value, &value_length) < 1)
     {
         return false;
     }
 
-    // Final parentheses
+    // Check final parentheses
     if (*(command + value_length) != ')')
     {
         return false;
