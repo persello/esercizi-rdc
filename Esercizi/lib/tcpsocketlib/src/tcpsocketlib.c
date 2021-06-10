@@ -29,40 +29,38 @@
 #include "tcpsocketlib.h"
 
 /* maximum number of simultaneous connections on the server side */
-#define QUEUELEN       8
+#define QUEUELEN 8
 
-
-int create_tcp_client_connection (char *ip_address, int port)
+int create_tcp_client_connection(char *ip_address, int port)
 {
    int sk;
    struct sockaddr_in srv;
 
    /* create a socket descriptor */
-   if ((sk = socket (AF_INET, SOCK_STREAM, 0)) < 0)
+   if ((sk = socket(AF_INET, SOCK_STREAM, 0)) < 0)
    {
-      error_handler ("socket() [create_tcp_client_connection()]");
+      error_handler("socket() [create_tcp_client_connection()]");
       return -1;
    }
 
    /* fill the (used) fields of the socket address with
       the server information (remote socket address) */
-   bzero ((char *) &srv, sizeof (srv));
+   bzero((char *)&srv, sizeof(srv));
    srv.sin_family = AF_INET;
-   srv.sin_addr.s_addr = inet_addr (ip_address);
-   srv.sin_port = htons (port);
+   srv.sin_addr.s_addr = inet_addr(ip_address);
+   srv.sin_port = htons(port);
 
    /* open a connection to the server */
-   if (connect (sk, (struct sockaddr *) &srv, sizeof(srv)) < 0)
+   if (connect(sk, (struct sockaddr *)&srv, sizeof(srv)) < 0)
    {
-      error_handler ("connect() [create_tcp_client_connection()]");
+      error_handler("connect() [create_tcp_client_connection()]");
       return -1;
    }
 
    return sk;
 }
 
-
-int create_tcp_server (char *ip_address, int port)
+int create_tcp_server(char *ip_address, int port)
 {
    int sk, csk;
    struct sockaddr_in srv, cln;
@@ -70,133 +68,127 @@ int create_tcp_server (char *ip_address, int port)
    int keep_server_alive;
 
    /* create a socket descriptor */
-   if ((sk = socket (AF_INET, SOCK_STREAM, 0)) < 0)
+   if ((sk = socket(AF_INET, SOCK_STREAM, 0)) < 0)
    {
-      error_handler ("socket() [create_tcp_server()]");
+      error_handler("socket() [create_tcp_server()]");
       return -1;
    }
 
    /* fill the (used) fields of the socket address with
       the server information (local socket address) */
-   bzero ((char *) &srv, sizeof (srv));
+   bzero((char *)&srv, sizeof(srv));
    srv.sin_family = AF_INET;
-   srv.sin_addr.s_addr = inet_addr (ip_address);
-   srv.sin_port = htons (port);
+   srv.sin_addr.s_addr = inet_addr(ip_address);
+   srv.sin_port = htons(port);
 
    /* add the local socket address to the socket descriptor */
-   if (bind (sk, (struct sockaddr *) &srv, sizeof(srv)) < 0)
+   if (bind(sk, (struct sockaddr *)&srv, sizeof(srv)) < 0)
    {
-      error_handler ("bind() [create_tcp_server()]");
+      error_handler("bind() [create_tcp_server()]");
       return -1;
    }
 
    /* make the socket a passive socket (enable the socket 
       accepting connections) */
-   if (listen (sk, QUEUELEN) < 0)
+   if (listen(sk, QUEUELEN) < 0)
    {
-      error_handler ("listen() [create_tcp_server()]");
+      error_handler("listen() [create_tcp_server()]");
       return -1;
    }
 
-   do                              /* server loop */
+   do /* server loop */
    {
-      dimcln = sizeof (cln);
+      dimcln = sizeof(cln);
 
       /* get the next connection request from the queue */
-      if ((csk = accept (sk, (struct sockaddr *) &cln, &dimcln)) < 0)
+      if ((csk = accept(sk, (struct sockaddr *)&cln, &dimcln)) < 0)
       {
-         error_handler ("accept() [create_tcp_server()]");
+         error_handler("accept() [create_tcp_server()]");
          return -1;
       }
 
-      keep_server_alive = server_handler (csk, inet_ntoa (cln.sin_addr), (int) cln.sin_port);
+      keep_server_alive = server_handler(csk, inet_ntoa(cln.sin_addr), (int)cln.sin_port);
 
-      close_tcp_connection (csk);
+      close_tcp_connection(csk);
 
    } while (keep_server_alive);
 
    return 1;
 }
 
-
-int close_tcp_connection (int sk)
+int close_tcp_connection(int sk)
 {
-   if (close (sk) != 0)
+   if (close(sk) != 0)
    {
-      error_handler ("close() [close_tcp_connection()]");
+      error_handler("close() [close_tcp_connection()]");
       return 0;
    }
 
    return 1;
 }
 
-
-void tcp_set_non_blocking_mode (int sk)
+void tcp_set_non_blocking_mode(int sk)
 {
    int flags;
-   
-   flags = fcntl (sk, F_GETFL, 0);
+
+   flags = fcntl(sk, F_GETFL, 0);
    fcntl(sk, F_SETFL, flags | O_NONBLOCK);
 
    return;
 }
 
-
-void tcp_set_blocking_mode (int sk)
+void tcp_set_blocking_mode(int sk)
 {
    int flags;
 
-   flags = fcntl (sk, F_GETFL, 0);
+   flags = fcntl(sk, F_GETFL, 0);
    fcntl(sk, F_SETFL, flags & ~O_NONBLOCK);
 
    return;
 }
 
-
-int tcp_send (int sk, char *buffer)
+int tcp_send(int sk, char *buffer)
 {
-   if (write (sk, buffer, strlen(buffer)) != strlen(buffer))
+   if (write(sk, buffer, strlen(buffer)) != (ssize_t)strlen(buffer))
    {
-      error_handler ("write() [tcp_send()]");
+      error_handler("write() [tcp_send()]");
       return 0;
    }
 
    return 1;
 }
 
-
-int tcp_binary_send (int sk, char *buffer, int msg_len)
+int tcp_binary_send(int sk, char *buffer, int msg_len)
 {
-   if (write (sk, buffer, msg_len) != msg_len)
+   if (write(sk, buffer, msg_len) != msg_len)
    {
-      error_handler ("write() [tcp_binary_send()]");
+      error_handler("write() [tcp_binary_send()]");
       return 0;
    }
 
    return 1;
 }
 
-
-int tcp_receive (int sk, char *buffer)
+int tcp_receive(int sk, char *buffer)
 {
    int dim, flags;
 
-   if ((dim = read (sk, buffer, BUFSIZ)) < 0)
+   if ((dim = read(sk, buffer, BUFSIZ)) < 0)
    {
-      flags = fcntl (sk, F_GETFL, 0);
+      flags = fcntl(sk, F_GETFL, 0);
       if ((flags & O_NONBLOCK) == O_NONBLOCK)
-      {   /* non-blocking mode */
+      { /* non-blocking mode */
          if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
             return 0;
          else
          {
-            error_handler ("read() [tcp_receive()]");
+            error_handler("read() [tcp_receive()]");
             return -1;
          }
       }
       else
       {
-         error_handler ("read() [tcp_receive()]");
+         error_handler("read() [tcp_receive()]");
          return -1;
       }
    }
@@ -205,27 +197,26 @@ int tcp_receive (int sk, char *buffer)
    return dim;
 }
 
-
-int tcp_binary_receive (int sk, char *buffer)
+int tcp_binary_receive(int sk, char *buffer)
 {
    int dim, flags;
 
-   if ((dim = read (sk, buffer, BUFSIZ)) < 0)
+   if ((dim = read(sk, buffer, BUFSIZ)) < 0)
    {
-      flags = fcntl (sk, F_GETFL, 0);
+      flags = fcntl(sk, F_GETFL, 0);
       if ((flags & O_NONBLOCK) == O_NONBLOCK)
-      {   /* non-blocking mode */
+      { /* non-blocking mode */
          if ((errno == EAGAIN) || (errno == EWOULDBLOCK))
             return 0;
          else
          {
-            error_handler ("read() [tcp_binary_receive()]");
+            error_handler("read() [tcp_binary_receive()]");
             return -1;
          }
       }
       else
       {
-         error_handler ("read() [tcp_binary_receive()]");
+         error_handler("read() [tcp_binary_receive()]");
          return -1;
       }
    }
@@ -233,21 +224,19 @@ int tcp_binary_receive (int sk, char *buffer)
    return dim;
 }
 
-
-void tcp_putchar (int sk, int ch)
+void tcp_putchar(int sk, int ch)
 {
    char buffer[BUFSIZ + 1];
 
    buffer[0] = ch;
    buffer[1] = '\0';
 
-   tcp_send (sk, buffer);
+   tcp_send(sk, buffer);
 
    return;
 }
 
-
-int tcp_getchar (int sk)
+int tcp_getchar(int sk)
 {
    static int i = 0;
    static int dim = 0;
@@ -256,11 +245,10 @@ int tcp_getchar (int sk)
    if (i >= dim || buffer[i] == '\0')
    {
       /* reload the buffer */
-      if ((dim = tcp_receive (sk, buffer)) == -1)
+      if ((dim = tcp_receive(sk, buffer)) == -1)
          return EOF;
       i = 0;
    }
 
    return buffer[i++];
 }
-

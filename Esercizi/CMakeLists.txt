@@ -6,7 +6,11 @@ enable_testing()
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output)
 
-add_compile_options(-Wall -Wpedantic)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+add_compile_options(-Wall -Wpedantic -Wextra)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+add_compile_options(-Weverything)
+endif()
 
 # Libraries
 add_subdirectory(lib/mudpsocketlib)

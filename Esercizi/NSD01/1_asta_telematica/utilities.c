@@ -13,6 +13,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdnoreturn.h>
 
 #include <udpsocketlib.h>
 #include <liblog/log.h>
@@ -23,7 +24,7 @@
  * @param socket_handle Socket handle.
  * @param status Exit status code.
  */
-void die(int socket_handle, int status)
+noreturn void die(int socket_handle, int status)
 {
     if (close_udp_socket(socket_handle))
     {
@@ -43,7 +44,7 @@ void die(int socket_handle, int status)
  * 
  * @param message Error message
  */
-void error_handler(const char *message)
+noreturn void error_handler(const char *message)
 {
     LOG_ERROR("%s", message);
     exit(EXIT_FAILURE);

@@ -21,18 +21,17 @@
 #include <udpsocketlib.h>
 #include <liblog/log.h>
 
-
-void server_loop(int socket_handle)
+static void server_loop(int socket_handle)
 {
     char buffer[BUFSIZ + 1];
 
     // Offers
-    double current_offer = STARTING_PRICE;
-    double max_offer = STARTING_PRICE;
+    double current_offer = MINIMUM_STARTING_PRICE;
+    double max_offer = MINIMUM_STARTING_PRICE;
 
     // Names
-    char current_offer_name[32];
-    char max_offer_name[32];
+    char current_offer_name[MAX_NAME_LENGTH];
+    char max_offer_name[MAX_NAME_LENGTH];
 
     // String initialization
     strcpy(current_offer_name, "");
@@ -49,7 +48,7 @@ void server_loop(int socket_handle)
          */
         if (parse_command(buffer, current_offer_name, &current_offer))
         {
-            LOG_INFO("Offerta ricevuta di %f da %s.", current_offer, current_offer_name);
+            LOG_INFO("Offerta di %.2lf ricevuta da %s.", current_offer, current_offer_name);
 
             /**
              * In case of best offer, save name and offer, then reply.
@@ -79,7 +78,7 @@ void server_loop(int socket_handle)
 }
 
 /**
- * @brief Usage: asta_telematica_server <port>
+ * @brief Usage: asta_telematica_server [-p <porta>]
  */
 int main(int argc, char *argv[])
 {
@@ -100,6 +99,7 @@ int main(int argc, char *argv[])
         case 'p':
             if (sscanf(optarg, "%hu", &port) != 1)
             {
+                LOG_ERROR("Formato porta non valido.");
                 parsing_fail_flag = true;
             }
             break;
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     // Abort execution if argument parsing failed
     if (parsing_fail_flag)
     {
-        LOG_INFO("Uso: %s [-p porta]", argv[0]);
+        LOG_INFO("Uso: %s [-p <porta>]", argv[0]);
         exit(EXIT_FAILURE);
     }
 
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
     LOG_INFO("Avvio server asta telematica sulla porta %u.", port);
     if ((socket_handle = create_udp_server("0.0.0.0", port)) > -1)
     {
-        LOG_INFO("Creato un server UDP con socket identifier: %d.", socket_handle);
+        LOG_INFO("Creato un server UDP con handle %d.", socket_handle);
     }
     else
     {

@@ -9,6 +9,7 @@
  * 
  */
 
+#include "constants.h"
 #include "server_utilities.h"
 #include "utilities.h"
 
@@ -80,7 +81,7 @@ bool parse_command(char *command, char *name, double *value)
     *(name + name_index) = '\0';
 
     // Check name length
-    if (strlen(name) > 31)
+    if (strlen(name) > MAX_NAME_LENGTH - 1)
     {
         return false;
     }
