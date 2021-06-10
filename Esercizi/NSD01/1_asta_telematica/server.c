@@ -6,7 +6,7 @@
 #include <string.h>
 #include <udpsocketlib.h>
 
-#define PORT 25000
+#define DEFAULT_PORT 25000
 #define STARTING_PRICE 0.0
 
 void server_loop(int socket_handle)
@@ -71,10 +71,29 @@ void server_loop(int socket_handle)
 int main(int argc, char *argv[])
 {
     int socket_handle;
+    uint16_t port = DEFAULT_PORT;
+
+    if (argc == 1)
+    {
+        printf("Porta non specificata, si usa la porta di default (%d).\n", DEFAULT_PORT);
+    }
+    else if (argc == 2)
+    {
+        if (sscanf(argv[1], "%hu", &port) != 1)
+        {
+            printf("Uso: %s <port>\n", argv[0]);
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        printf("Uso: %s <port>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
 
     // Avvio del server
-    printf("Avvio server asta telematica.\n");
-    if ((socket_handle = create_udp_server("0.0.0.0", PORT)) > -1)
+    printf("Avvio server asta telematica sulla porta %u.\n", port);
+    if ((socket_handle = create_udp_server("0.0.0.0", port)) > -1)
     {
         printf("Creato un server UDP con socket identifier: %d.\n", socket_handle);
     }
