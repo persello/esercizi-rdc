@@ -21,6 +21,11 @@
 #include <udpsocketlib.h>
 #include <liblog/log.h>
 
+/**
+ * @brief Manages the main server loop.
+ * 
+ * @param socket_handle The socket handle.
+ */
 static void server_loop(int socket_handle)
 {
     char buffer[BUFSIZ + 1];

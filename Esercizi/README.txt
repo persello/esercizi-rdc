@@ -11,3 +11,5 @@ Oppure usando lo script `build.sh`.
 
 I binari risultanti verranno installati nella cartella Esercizi/output,
 suddivisi per esercizio.
+
+Sorgente disponibile su https://github.com/persello/esercizi-rdc.

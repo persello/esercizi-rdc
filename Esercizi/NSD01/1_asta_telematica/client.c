@@ -11,6 +11,7 @@
 
 #include "constants.h"
 #include "utilities.h"
+#include "client_utilities.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -19,105 +20,6 @@
 
 #include <liblog/log.h>
 #include <udpsocketlib.h>
-
-/**
- * @brief Types of possible replies.
- * 
- */
-typedef enum
-{
-    /**
-     * @brief The server's reply is not valid.
-     * 
-     */
-    INVALID_REPLY,
-
-    /**
-     * @brief The server received an invalid command.
-     * 
-     */
-    INVALID_OFFER,
-
-    /**
-     * @brief The server accepted this offer as the best offer.
-     * 
-     */
-    ACCEPTED,
-
-    /**
-     * @brief This offer is not the best offer.
-     * 
-     */
-    NOT_ACCEPTED,
-} reply_result_t;
-
-/**
- * @brief Receives and parses a reply. Blocking. Ignores other servers' UDP packets.
- * 
- * @param socket_handle The socket handle.
- * @param expected_address The expected IP address.
- * @return reply_result_t Result value from the struct.
- */
-static reply_result_t receive_and_parse_reply(int socket_handle, char *expected_address)
-{
-    char buffer[BUFSIZ + 1];
-    char server_addr[128];
-    int port;
-
-    bool correct_server = false;
-    reply_result_t result = INVALID_REPLY;
-
-    do
-    {
-        udp_receive_and_get_sender_info(socket_handle, buffer, server_addr, &port);
-
-        if (strcmp(server_addr, expected_address) == 0)
-        {
-            correct_server = true;
-            if (strcmp(buffer, OFFER_ACCEPTED_MSG) == 0)
-            {
-                result = ACCEPTED;
-            }
-            else if (strcmp(buffer, OFFER_NOT_ACCEPTED_MSG) == 0)
-            {
-                result = NOT_ACCEPTED;
-            }
-            else if (strcmp(buffer, OFFER_INVALID_MSG) == 0)
-            {
-                result = INVALID_OFFER;
-            }
-            else
-            {
-                result = INVALID_REPLY;
-            }
-        }
-    } while (!correct_server);
-
-    return result;
-}
-
-/**
- * @brief Sends an offer to a server.
- * 
- * @param handle The client handle.
- * @param address The server address.
- * @param port The server's port.
- * @param offer Offer value.
- * @param name Offerer name.
- * @return true If the offer is correctly sent.
- * @return false Otherwise.
- */
-static bool make_offer(int handle, char *address, uint16_t port, double offer, char *name)
-{
-    char *command;
-
-    int result;
-    asprintf(&command, "OFFERTA NOME(%s) VALORE(%.2lf)", name, offer);
-
-    result = udp_send(handle, command, address, port);
-    free(command);
-    return result;
-}
 
 /**
  * @brief Usage: asta_telematica_client -o <offerta> -n <nome> -s <indirizzo server> [-p <porta>]
