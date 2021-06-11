@@ -31,14 +31,17 @@ reply_result_t receive_and_parse_reply(int socket_handle, char *expected_address
     bool correct_server = false;
     reply_result_t result = INVALID_REPLY;
 
+    // Loop until we receive something from the CORRECT server
     do
     {
         udp_receive_and_get_sender_info(socket_handle, buffer, server_addr, &port);
 
+        // Check address correctness
         if (strcmp(server_addr, expected_address) == 0)
         {
             correct_server = true;
 
+            // Parse reply
             if (strcmp(buffer, OFFER_ACCEPTED_MSG) == 0)
             {
                 result = ACCEPTED;
@@ -56,6 +59,7 @@ reply_result_t receive_and_parse_reply(int socket_handle, char *expected_address
                 result = INVALID_REPLY;
             }
         }
+
     } while (!correct_server);
 
     return result;
