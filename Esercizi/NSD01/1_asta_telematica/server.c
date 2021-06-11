@@ -85,13 +85,13 @@ int main(int argc, char *argv[]) {
   int socket_handle;
   uint16_t port = DEFAULT_PORT;
 
-  // Input parameters
-  int opt; // Current option.
-  bool parsing_fail_flag =
-      false; // Flag that signals that a parsing error occurred.
+  // Current option.
+  int opt;
+  // Flag that signals that a parsing error occurred.
+  bool parsing_fail_flag = false;
 
   // Parameter parsing
-  while ((opt = getopt(argc, argv, ":p:h")) != -1) {
+  while ((opt = getopt(argc, argv, ":p:")) != -1) {
     switch (opt) {
       // Port parameter
     case 'p':
