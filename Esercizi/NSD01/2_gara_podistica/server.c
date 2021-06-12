@@ -58,7 +58,28 @@ int server_handler(int sk, char *ip_addr, int port) {
       } else if (strcmp(command, "LISTA\n") == 0 ||
                  strcmp(command, "LISTA\r\n") == 0) {
 
+        runner_t *runners;
+        unsigned long count;
+        char current_line[256 + 1];
+
         LOG_INFO("Invio lista dei partecipanti.");
+
+        if ((count = database_get_all(&runners)) > 0) {
+
+          LOG_INFO("Invio di %lu partecipanti.", count);
+
+          for (unsigned long i = 0; i < count; i++) {
+            snprintf(current_line, 256, "%lu: %s\n", runners[i].number,
+                     runners[i].name);
+            tcp_send(sk, current_line);
+          }
+          tcp_send(sk, ".\n");
+        } else {
+          LOG_INFO("Lista partecipanti vuota.");
+          tcp_send(sk, "Lista vuota.\n");
+        }
+
+        free(runners);
 
       } else if (strncmp(command, "ISCRIVI ", 8) == 0) {
 
@@ -80,6 +101,9 @@ int server_handler(int sk, char *ip_addr, int port) {
             tcp_send(sk, answer);
           }
         }
+      } else {
+        LOG_INFO("Ricevuto un comando sconosciuto: %s.", command);
+        tcp_send(sk, "Comando sconosciuto.\n");
       }
 
       free(command);

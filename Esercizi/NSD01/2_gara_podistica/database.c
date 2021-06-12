@@ -11,7 +11,6 @@
 
 #include "database.h"
 
-#include <liblog/log.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,19 +31,10 @@ unsigned long database_add(char *name) {
   if (fp != NULL) {
     fread(&count, sizeof(count), 1, fp);
 
-    LOG_INFO("COUNT: %lu", count);
-
     runners = (runner_t *)malloc(sizeof(runner_t) * (count + 1));
-
-    LOG_INFO("MALLOC OK");
-
     unsigned long read_count = fread(runners, sizeof(runner_t), count, fp);
 
-    LOG_INFO("READ COUNT: %lu", read_count);
-
     fclose(fp);
-
-    LOG_INFO("FCLOSE 1 OK");
 
     if (read_count != count) {
       free(runners);
@@ -62,13 +52,10 @@ unsigned long database_add(char *name) {
 
   // Start from 1
   new_runner.number = count;
-
-  LOG_INFO("BEFORE STRCPY, POINTER=%p, NAME=%s", new_runner.name, name);
   memset(new_runner.name, 0, 128 + 1);
   strcpy(new_runner.name, name);
 
-  LOG_INFO("NEW RUNNER INIT OK");
-
+  // Add to end of runners list
   runners[count - 1] = new_runner;
 
   // Write
@@ -79,12 +66,8 @@ unsigned long database_add(char *name) {
     return 0;
   }
 
-  LOG_INFO("FOPEN 2 OK");
-
   if (fwrite(&count, sizeof(count), 1, fp) == 1) {
-    LOG_INFO("COUNT WRITTEN OK");
     if (fwrite(runners, sizeof(runner_t), count, fp) == count) {
-      LOG_INFO("RUNNERS WRITTEN OK");
       fclose(fp);
       free(runners);
       return count;
@@ -99,6 +82,30 @@ unsigned long database_add(char *name) {
 /**
  * @brief Gets all the runners.
  *
- * @return runner_t* Array of runners. Remember to free().
+ * @param runners Runners. Remember to free().
+ * @return unsigned long Number of runners.
  */
-runner_t *database_get_all() {}
+unsigned long database_get_all(runner_t **runners) {
+  FILE *fp;
+  unsigned long count = 0;
+
+  fp = fopen("runners", "rb");
+
+  if (fp != NULL) {
+    fread(&count, sizeof(count), 1, fp);
+
+    *runners = (runner_t *)malloc(sizeof(runner_t) * (count));
+    unsigned long read_count = fread(*runners, sizeof(runner_t), count, fp);
+
+    fclose(fp);
+
+    if (read_count != count) {
+      return 0;
+    }
+
+    return count;
+  } else {
+
+    return 0;
+  }
+}

@@ -15,7 +15,7 @@
 
 /**
  * @brief Adds a runner to the database.
- * 
+ *
  * @param name The new runner's name.
  * @return unsigned long The runner's number, -1 on failure.
  */
@@ -23,7 +23,8 @@ unsigned long database_add(char *name);
 
 /**
  * @brief Gets all the runners.
- * 
- * @return runner_t* Array of runners. Remember to free().
+ *
+ * @param runners Runners. Remember to free().
+ * @return unsigned long Number of runners.
  */
-runner_t *database_get_all();
+unsigned long database_get_all(runner_t **runners);
