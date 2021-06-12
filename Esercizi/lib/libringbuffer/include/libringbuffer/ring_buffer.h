@@ -78,7 +78,7 @@ size_t ring_buffer_append(ring_buffer_t *buffer, char *string);
  * @param delimiter The delimiter.
  * @return size_t Number of read characters.
  */
-size_t ring_buffer_read_until(ring_buffer_t *buffer, char *output, char delimiter);
+size_t ring_buffer_read_until(ring_buffer_t *buffer, char **output, char delimiter);
 
 /**
  * @brief Reads into the string buffer until a \n, or the end of the buffer.
@@ -87,14 +87,4 @@ size_t ring_buffer_read_until(ring_buffer_t *buffer, char *output, char delimite
  * @param output The output string.
  * @return size_t Number of read characters.
  */
-size_t ring_buffer_read_line(ring_buffer_t *buffer, char *output);
-
-/**
- * @brief Tries to read n characters from the buffer.
- *
- * @param buffer The buffer.
- * @param output The output string.
- * @param n Target number of characters to read.
- * @return size_t Number of read characters.
- */
-size_t ring_buffer_read_n(ring_buffer_t *buffer, char *output, unsigned long n);
+size_t ring_buffer_read_line(ring_buffer_t *buffer, char **output);

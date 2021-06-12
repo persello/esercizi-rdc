@@ -1,7 +1,7 @@
 project(gara_podistica)
 
 # Server
-add_executable(${PROJECT_NAME}_server server.c runner.c utilities.c)
+add_executable(${PROJECT_NAME}_server server.c database.c utilities.c)
 target_link_libraries( ${PROJECT_NAME}_server
     socketlib::tcp
     liblog::log

@@ -10,6 +10,7 @@
  */
 
 #include "constants.h"
+#include "database.h"
 #include "runner.h"
 #include "utilities.h"
 
@@ -31,15 +32,54 @@ int server_handler(int sk, char *ip_addr, int port) {
 
   while (tcp_receive(sk, received)) {
     ring_buffer_append(buffer, received);
-    LOG_INFO("REC: %s", received);
 
-    while (ring_buffer_read_line(buffer, command) != (size_t)-1) {
+    while (ring_buffer_read_line(buffer, &command) != (size_t)-1) {
 
-      LOG_INFO("COM: %s", command);
-      if (strcmp(command, "BYE\n") == 0) {
+      LOG_INFO("Comando: %s", command);
+      if (strcmp(command, "BYE\n") == 0 || strcmp(command, "BYE\r\n") == 0) {
+
+        LOG_INFO("Chiusura connessione con %s, porta %d.", ip_addr, port);
+
+        tcp_send(sk, "Connessione chiusa.\n");
+        ring_buffer_delete(buffer);
         return 1;
-      } else if (strcmp(command, "GOODBYE\n") == 0) {
+
+      } else if (strcmp(command, "SHUTDOWN\n") == 0 ||
+                 strcmp(command, "SHUTDOWN\r\n") == 0) {
+
+        LOG_INFO(
+            "Chiusura connessione con %s, porta %d. Spegnimento del server.",
+            ip_addr, port);
+
+        tcp_send(sk, "Connessione chiusa.\n");
+        ring_buffer_delete(buffer);
         return 0;
+
+      } else if (strcmp(command, "LISTA\n") == 0 ||
+                 strcmp(command, "LISTA\r\n") == 0) {
+
+        LOG_INFO("Invio lista dei partecipanti.");
+
+      } else if (strncmp(command, "ISCRIVI ", 8) == 0) {
+
+        char name[128 + 1];
+        strcpy(name, "");
+
+        // Up to \r, \n.
+        sscanf(command, "%*s %128[^\r\n]", name);
+
+        if (strlen(name) > 0) {
+          LOG_INFO("Richiesta iscrizione per %s.", name);
+          unsigned long number = database_add(name);
+
+          if (number == 0) {
+            tcp_send(sk, "Errore durante l'aggiunta al database.\n");
+          } else {
+            char answer[128 + 1];
+            snprintf(answer, 128, "%lu\n", number);
+            tcp_send(sk, answer);
+          }
+        }
       }
 
       free(command);
@@ -47,7 +87,8 @@ int server_handler(int sk, char *ip_addr, int port) {
     }
   }
 
-  LOG_INFO("Chiusura connessione con %s, porta %d.", ip_addr, port);
+  LOG_WARNING("Chiusura inaspettata connessione con %s, porta %d.", ip_addr,
+              port);
 
   ring_buffer_delete(buffer);
   return 1;
@@ -76,6 +117,7 @@ int main(int argc, char *argv[]) {
       }
       break;
 
+      // Address parameter
     case 'a':
       strncpy(ip_addr, optarg, 128);
       break;
