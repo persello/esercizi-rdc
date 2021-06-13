@@ -93,6 +93,7 @@ int main(int argc, char *argv[]) {
   // Parameter parsing
   while ((opt = getopt(argc, argv, ":p:")) != -1) {
     switch (opt) {
+
       // Port parameter
     case 'p':
       if (sscanf(optarg, "%hu", &port) != 1) {

@@ -35,7 +35,6 @@ int server_handler(int sk, char *ip_addr, int port) {
 
     while (ring_buffer_read_line(buffer, &command) != (size_t)-1) {
 
-      LOG_INFO("Comando: %s", command);
       if (strcmp(command, "BYE\n") == 0 || strcmp(command, "BYE\r\n") == 0) {
 
         LOG_INFO("Chiusura connessione con %s, porta %d.", ip_addr, port);
