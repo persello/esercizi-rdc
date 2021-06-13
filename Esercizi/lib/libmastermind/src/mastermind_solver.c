@@ -43,13 +43,7 @@ mm_game_t *mm_create_game() {
 }
 
 void mm_print_game(mm_game_t *game) {
-  LOG_INFO("Game information: %d combinations, %lu dismissed. Combinations:", MM_COMBINATIONS, game->dismissed_count);
-  // for (int i = 0; i < MM_COMBINATIONS; i++) {
-  //   for (int j = 0; j < MM_CODE_LENGTH; j++) {
-  //     printf("%d.", game->combinations[i][j]);
-  //   }
-  //   printf("\t%s\n", game->dismissed[i] ? "DISMISSED" : "OK");
-  // }
+  LOG_INFO("Game information: %d combinations, %lu dismissed.", MM_COMBINATIONS, game->dismissed_count);
 }
 
 unsigned long mm_make_guess(mm_game_t *game, unsigned char *guess) {
@@ -65,13 +59,12 @@ unsigned long mm_make_guess(mm_game_t *game, unsigned char *guess) {
     }
   } else {
     unsigned long minimax = MM_COMBINATIONS;
-    unsigned char best_guess[MM_CODE_LENGTH];
 
     for (unsigned long i = 0; i < MM_COMBINATIONS; i++) {
       if (game->dismissed[i] == false) {
         unsigned long max_frequency = 0;
-        unsigned long minimax_map[MM_DIGITS][MM_DIGITS];
-        memset(minimax_map, 0, sizeof(unsigned long) * MM_DIGITS * MM_DIGITS);
+        unsigned long minimax_map[MM_DIGITS + 1][MM_DIGITS + 1];
+        memset(minimax_map, 0, sizeof(unsigned long) * (MM_DIGITS + 1) * (MM_DIGITS + 1));
 
         for (unsigned long j = 0; j < MM_COMBINATIONS; j++) {
           if (game->dismissed[j] == false) {
@@ -80,24 +73,21 @@ unsigned long mm_make_guess(mm_game_t *game, unsigned char *guess) {
           }
         }
 
-        LOG_INFO("Minimax map:\n\n");
-        for (int i = 0; i < MM_DIGITS; i++) {
-          for (int j = 0; j < MM_DIGITS; j++) {
-            printf("%lu\t", minimax_map[i][j]);
-            max_frequency = minimax_map[i][j] > max_frequency ? minimax_map[i][j] : max_frequency;
+        for (int k = 0; k < MM_DIGITS; k++) {
+          for (int h = 0; h < MM_DIGITS; h++) {
+            max_frequency = minimax_map[k][h] > max_frequency ? minimax_map[k][h] : max_frequency;
           }
-          printf("\n");
         }
 
         if (max_frequency < minimax) {
           minimax = max_frequency;
-          memcpy(best_guess, game->combinations[i], sizeof(unsigned char) * MM_CODE_LENGTH);
+          memcpy(guess, game->combinations[i], sizeof(unsigned char) * MM_CODE_LENGTH);
         }
       }
     }
   }
 
-  return MM_COMBINATIONS - game->dismissed_count;
+  return (unsigned long) (MM_COMBINATIONS - (game->dismissed_count));
 }
 
 bool mm_receive_guess_result(mm_game_t *game, mm_guess_result_t result, unsigned char *guess) {

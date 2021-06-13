@@ -9,6 +9,8 @@
  *
  */
 
+#include <stdlib.h>
+
 #include <liblog/log.h>
 #include <libmastermind/mastermind_solver.h>
 
@@ -33,6 +35,7 @@ int main(int argc, char *argv[]) {
 
     if (mm_make_guess(game, guess) == 0) {
       LOG_WARNING("No more guesses available. Something went wrong.");
+      free(game);
       return 1;
     }
     while (!ask_guess_to_user(guess, &result)) {
@@ -41,6 +44,7 @@ int main(int argc, char *argv[]) {
 
     if (mm_receive_guess_result(game, result, guess)) {
       LOG_INFO("Win!");
+      free(game);
       return 0;
     }
   }

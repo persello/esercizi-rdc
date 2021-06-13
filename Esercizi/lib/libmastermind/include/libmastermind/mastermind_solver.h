@@ -12,8 +12,8 @@
 #include <stdbool.h>
 
 #define MM_CODE_LENGTH 4
-#define MM_DIGITS 4         // 2 <= MM_DIGITS <= 255
-#define MM_COMBINATIONS 256 // MM_DIGITS^MM_CODE_LENGTH
+#define MM_DIGITS 10          // 2 <= MM_DIGITS <= 255
+#define MM_COMBINATIONS 10000 // MM_DIGITS^MM_CODE_LENGTH
 
 typedef struct {
   int positions;
