@@ -20,6 +20,7 @@ add_subdirectory(lib/tcpsocketlib)
 add_subdirectory(lib/udpsocketlib)
 add_subdirectory(lib/liblog)
 add_subdirectory(lib/libringbuffer)
+add_subdirectory(lib/libmastermind)
 
 # Executables
 add_subdirectory(NSD01/1_asta_telematica)

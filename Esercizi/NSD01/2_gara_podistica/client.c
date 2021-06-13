@@ -99,8 +99,7 @@ unsigned long add_runner(int sk, char *name) {
         ring_buffer_delete(buffer);
         return number;
       } else {
-        LOG_WARNING("Errore durante l'aggiunta del partecipante: %s.",
-                    received_block);
+        LOG_WARNING("Errore durante l'aggiunta del partecipante: %s.", received_block);
         free(received_block);
         ring_buffer_delete(buffer);
         return 0;
@@ -208,14 +207,13 @@ int main(int argc, char *argv[]) {
   }
 
   if (parsing_fail_flag) {
-    LOG_ERROR(
-        "Uso: %s -s <server> [-p <porta>] [-i <nome>] [-l] [-x]\r\n\r\n"
-        "         -s <server>:           Indirizzo del server.\r\n"
-        "         -p <porta>:            Porta del server (default %d).\r\n"
-        "         -i <nome>:             Iscrivi un nuovo partecipante.\r\n"
-        "         -l:                    Richiedi lista partecipanti.\r\n"
-        "         -x:                    Richiedi spegnimento server.\r\n",
-        argv[0], DEFAULT_PORT);
+    LOG_ERROR("Uso: %s -s <server> [-p <porta>] [-i <nome>] [-l] [-x]\r\n\r\n"
+              "         -s <server>:           Indirizzo del server.\r\n"
+              "         -p <porta>:            Porta del server (default %d).\r\n"
+              "         -i <nome>:             Iscrivi un nuovo partecipante.\r\n"
+              "         -l:                    Richiedi lista partecipanti.\r\n"
+              "         -x:                    Richiedi spegnimento server.\r\n",
+              argv[0], DEFAULT_PORT);
     exit(EXIT_FAILURE);
   }
 

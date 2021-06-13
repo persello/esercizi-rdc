@@ -43,19 +43,15 @@ int server_handler(int sk, char *ip_addr, int port) {
         ring_buffer_delete(buffer);
         return 1;
 
-      } else if (strcmp(command, "SHUTDOWN\n") == 0 ||
-                 strcmp(command, "SHUTDOWN\r\n") == 0) {
+      } else if (strcmp(command, "SHUTDOWN\n") == 0 || strcmp(command, "SHUTDOWN\r\n") == 0) {
 
-        LOG_INFO(
-            "Chiusura connessione con %s, porta %d. Spegnimento del server.",
-            ip_addr, port);
+        LOG_INFO("Chiusura connessione con %s, porta %d. Spegnimento del server.", ip_addr, port);
 
         tcp_send(sk, "Connessione chiusa.\n");
         ring_buffer_delete(buffer);
         return 0;
 
-      } else if (strcmp(command, "LISTA\n") == 0 ||
-                 strcmp(command, "LISTA\r\n") == 0) {
+      } else if (strcmp(command, "LISTA\n") == 0 || strcmp(command, "LISTA\r\n") == 0) {
 
         runner_t *runners;
         unsigned long count;
@@ -68,8 +64,7 @@ int server_handler(int sk, char *ip_addr, int port) {
           LOG_INFO("Invio di %lu partecipanti.", count);
 
           for (unsigned long i = 0; i < count; i++) {
-            snprintf(current_line, 256, "%lu: %s\n", runners[i].number,
-                     runners[i].name);
+            snprintf(current_line, 256, "%lu: %s\n", runners[i].number, runners[i].name);
             tcp_send(sk, current_line);
           }
           tcp_send(sk, ".\n");
@@ -110,8 +105,7 @@ int server_handler(int sk, char *ip_addr, int port) {
     }
   }
 
-  LOG_WARNING("Chiusura inaspettata connessione con %s, porta %d.", ip_addr,
-              port);
+  LOG_WARNING("Chiusura inaspettata connessione con %s, porta %d.", ip_addr, port);
 
   ring_buffer_delete(buffer);
   return 1;

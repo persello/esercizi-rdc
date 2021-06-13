@@ -40,9 +40,8 @@ int main(int argc, char *argv[]) {
   strcpy(name, "");
 
   // Input parameters
-  int opt; // Current option.
-  bool parsing_fail_flag =
-      false; // Flag that signals that a parsing error occurred.
+  int opt;                        // Current option.
+  bool parsing_fail_flag = false; // Flag that signals that a parsing error occurred.
 
   // Parameter parsing
   while ((opt = getopt(argc, argv, ":o:n:s:p:")) != -1) {
@@ -106,9 +105,7 @@ int main(int argc, char *argv[]) {
 
   // Abort execution if argument parsing failed
   if (parsing_fail_flag) {
-    LOG_INFO(
-        "Uso: %s -o <offerta> -n <nome> -s <indirizzo server> [-p <porta>]",
-        argv[0]);
+    LOG_INFO("Uso: %s -o <offerta> -n <nome> -s <indirizzo server> [-p <porta>]", argv[0]);
     exit(EXIT_FAILURE);
   }
 

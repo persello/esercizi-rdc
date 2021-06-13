@@ -51,8 +51,7 @@ static void server_loop(int socket_handle) {
      *
      */
     if (parse_command(buffer, current_offer_name, &current_offer)) {
-      LOG_INFO("Offerta di %.2lf ricevuta da %s.", current_offer,
-               current_offer_name);
+      LOG_INFO("Offerta di %.2lf ricevuta da %s.", current_offer, current_offer_name);
 
       /**
        * In case of best offer, save name and offer, then reply.

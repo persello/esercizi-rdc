@@ -23,8 +23,7 @@
  * @param expected_address The expected IP address.
  * @return reply_result_t Result value from the struct.
  */
-reply_result_t receive_and_parse_reply(int socket_handle,
-                                       char *expected_address) {
+reply_result_t receive_and_parse_reply(int socket_handle, char *expected_address) {
   char buffer[BUFSIZ + 1];
   char server_addr[128];
   int port;
@@ -68,8 +67,7 @@ reply_result_t receive_and_parse_reply(int socket_handle,
  * @return true If the offer is correctly sent.
  * @return false Otherwise.
  */
-bool make_offer(int handle, char *address, uint16_t port, double offer,
-                char *name) {
+bool make_offer(int handle, char *address, uint16_t port, double offer, char *name) {
 
   char *command;
 
