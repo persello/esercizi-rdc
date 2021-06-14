@@ -25,6 +25,8 @@ add_subdirectory(lib/libmastermind)
 # Executables
 add_subdirectory(NSD01/1_asta_telematica)
 add_subdirectory(NSD01/2_gara_podistica)
+# add_subdirectory(NSD01/3_gara_podistica_parallelo)
+add_subdirectory(NSD01/4_mastermind)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
