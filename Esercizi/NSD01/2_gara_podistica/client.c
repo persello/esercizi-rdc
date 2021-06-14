@@ -21,9 +21,34 @@
 #include <libringbuffer/ring_buffer.h>
 #include <tcpsocketlib.h>
 
+/**
+ * @brief Closes the connection with the server. First sends the 'BYE' command, then closes the TCP socket.
+ *
+ * @param sk Socket handle.
+ */
 void close_connection(int sk);
+
+/**
+ * @brief Sends the shutdown command to the server and closes the connection.
+ *
+ * @param sk Socket handle.
+ */
 void shutdown_server(int sk);
+
+/**
+ * @brief Requests to the server the participants list, then prints it to stdout.
+ *
+ * @param sk Socket handle.
+ */
 void print_participants_list(int sk);
+
+/**
+ * @brief Requests to the server to add a participant with a specific name.
+ *
+ * @param sk Socket handle.
+ * @param name Participant's name.
+ * @return unsigned long The assigned number (>0). 0 on failure.
+ */
 unsigned long add_runner(int sk, char *name);
 
 void close_connection(int sk) {
@@ -41,64 +66,90 @@ void shutdown_server(int sk) {
 void print_participants_list(int sk) {
   ring_buffer_t *buffer;
 
-  // Two times a reasonably large TCP packet (usually smaller ~ 1500?).
-  buffer = ring_buffer_create(4096 * 2);
+  // Two times the single buffer's size.
+  buffer = ring_buffer_create(BUFSIZ * 2);
 
+  // Temporary buffer for a single TCP segment.
   char temp[BUFSIZ + 1];
+
+  // A complete block (until \n).
   char *received_block = NULL;
 
+  // Request the list.
   tcp_send(sk, "LISTA\n");
   LOG_INFO("Ricezione lista dal server...");
 
+  // Blocking, receives a segment.
   while (tcp_receive(sk, temp)) {
+
+    // Add to buffer and wait for a complete line.
     ring_buffer_append(buffer, temp);
 
     while (ring_buffer_read_line(buffer, &received_block) != (size_t)-1) {
 
+      // A line is complete, and has been copied to received_block.
+
+      // If a '.' is detected at the beginning of a line, it means that we reached the end of the list.
       if (strncmp(received_block, ".", 1) == 0) {
+
+        // Free everything and return.
         free(received_block);
         ring_buffer_delete(buffer);
         return;
       }
 
+      // If we're before the end of the list, print the line.
       printf("%s", received_block);
 
+      // Free the block for the next line (gets allocated in ring_buffer_read_line, see docs).
       free(received_block);
       received_block = NULL;
     }
   }
 
+  // Could get here due to an unexpected disconnection. In that case, free the buffer.
   ring_buffer_delete(buffer);
 }
 
-/**
- * @brief Adds a new runner to the server.
- *
- * @param sk Socket handle.
- * @param name Runner name.
- * @return unsigned long Runner number. 0 on failure.
- */
 unsigned long add_runner(int sk, char *name) {
   ring_buffer_t *buffer;
-  buffer = ring_buffer_create(1024);
 
+  // Two times the single buffer's size.
+  buffer = ring_buffer_create(BUFSIZ * 2);
+
+  // Temporary buffer for a single TCP segment.
   char temp[BUFSIZ + 1];
+
+  // A complete line (block, command?), up to \n.
   char *received_block = NULL;
+
+  // Buffer for outgoing commands.
   char send_command[256 + 1];
+
+  // Received number.
   unsigned long number;
 
+  // Build outgoing command and send it.
   snprintf(send_command, 256, "ISCRIVI %s\n", name);
   tcp_send(sk, send_command);
 
+  // Blocking, receives a segment.
   while (tcp_receive(sk, temp)) {
+
+    // Add to buffer and wait for a complete line.
     ring_buffer_append(buffer, temp);
 
     while (ring_buffer_read_line(buffer, &received_block) != (size_t)-1) {
+
+      // A line is complete, and has been copied to received_block.
+
+      // If a number is available, then copy it in number and return it.
       if (sscanf(received_block, "%lu", &number) == 1) {
         free(received_block);
         ring_buffer_delete(buffer);
         return number;
       } else {
+        // If a number is not detected, it means that the server sent an error string.
         LOG_WARNING("Errore durante l'aggiunta del partecipante: %s.", received_block);
         free(received_block);
         ring_buffer_delete(buffer);
@@ -107,6 +158,7 @@ unsigned long add_runner(int sk, char *name) {
     }
   }
 
+  // Executed only on unexpected disconnections.
   ring_buffer_delete(buffer);
   return 0;
 }
@@ -196,16 +248,19 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // Check for minimum IP length 1.1.1.1 (7 characters)
   if (strlen(server) < 7) {
     LOG_ERROR("Indicare un indirizzo IP valido.");
     parsing_fail_flag = true;
   }
 
+  // If no operations have been specified, it makes no sense to connect with the server.
   if (!request_list_flag && !request_shutdown_flag && strlen(name) == 0) {
     LOG_ERROR("Indicare almeno un'operazione da eseguire.");
     parsing_fail_flag = true;
   }
 
+  // Print help message.
   if (parsing_fail_flag) {
     LOG_ERROR("Uso: %s -s <server> [-p <porta>] [-i <nome>] [-l] [-x]\r\n\r\n"
               "         -s <server>:           Indirizzo del server.\r\n"
@@ -217,12 +272,14 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
+  // Connect
   LOG_INFO("Connessione a %s:%d.", server, port);
   if ((socket_handle = create_tcp_client_connection(server, port)) == -1) {
     LOG_ERROR("Errore di connessione.");
     exit(EXIT_FAILURE);
   }
-
+  
+  // If a name has been specified, call the function that adds a runner to the DB. Print the received number.
   if (strlen(name) > 0) {
     unsigned long number;
     if ((number = add_runner(socket_handle, name)) != 0) {
@@ -232,10 +289,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // If the list flag is on, request the list and print it.
   if (request_list_flag) {
     print_participants_list(socket_handle);
   }
 
+  // If the shutdown flag is on, request shutdown, otherwise simply disconnect.
   if (request_shutdown_flag) {
     shutdown_server(socket_handle);
   } else {
@@ -245,4 +304,5 @@ int main(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 
+// Otherwise the compiler cries.
 int server_handler() { return 0; }

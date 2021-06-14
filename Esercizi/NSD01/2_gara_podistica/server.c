@@ -28,14 +28,18 @@ int server_handler(int sk, char *ip_addr, int port) {
 
   LOG_INFO("Connessione aperta con %s, porta %d.", ip_addr, port);
 
-  buffer = ring_buffer_create(1024);
+  // Could contain two maximum-size segments.
+  buffer = ring_buffer_create(BUFSIZ * 2);
 
   while (tcp_receive(sk, received)) {
     ring_buffer_append(buffer, received);
 
+    // Wait for a complete line.
     while (ring_buffer_read_line(buffer, &command) != (size_t)-1) {
 
       if (strcmp(command, "BYE\n") == 0 || strcmp(command, "BYE\r\n") == 0) {
+
+        // Disconnection command.
 
         LOG_INFO("Chiusura connessione con %s, porta %d.", ip_addr, port);
 
@@ -45,6 +49,8 @@ int server_handler(int sk, char *ip_addr, int port) {
 
       } else if (strcmp(command, "SHUTDOWN\n") == 0 || strcmp(command, "SHUTDOWN\r\n") == 0) {
 
+        // Shutdown command.
+
         LOG_INFO("Chiusura connessione con %s, porta %d. Spegnimento del server.", ip_addr, port);
 
         tcp_send(sk, "Connessione chiusa.\n");
@@ -52,6 +58,8 @@ int server_handler(int sk, char *ip_addr, int port) {
         return 0;
 
       } else if (strcmp(command, "LISTA\n") == 0 || strcmp(command, "LISTA\r\n") == 0) {
+
+        // List command.
 
         runner_t *runners;
         unsigned long count;
@@ -77,12 +85,15 @@ int server_handler(int sk, char *ip_addr, int port) {
 
       } else if (strncmp(command, "ISCRIVI ", 8) == 0) {
 
+        // Add runner command.
+
         char name[128 + 1];
         strcpy(name, "");
 
         // Up to \r, \n.
         sscanf(command, "%*s %128[^\r\n]", name);
 
+        // If a name has been supplies, add it to the database, get the number and check for errors.
         if (strlen(name) > 0) {
           LOG_INFO("Richiesta iscrizione per %s.", name);
           unsigned long number = database_add(name);
@@ -96,6 +107,9 @@ int server_handler(int sk, char *ip_addr, int port) {
           }
         }
       } else {
+
+        // Unknown command.
+
         LOG_INFO("Ricevuto un comando sconosciuto: %s.", command);
         tcp_send(sk, "Comando sconosciuto.\n");
       }
