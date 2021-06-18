@@ -11,9 +11,135 @@
 
 #include "runnerdb/database.h"
 
+#include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+/**
+ * @brief Creates a lock file.
+ *
+ * @return true If successful.
+ * @return false In case of error.
+ */
+bool database_create_lock_file(void);
+
+/**
+ * @brief Checks whether the database is effectively locked.
+ *
+ * @return true A lockfile exists and the process that created it is alive.
+ * @return false Safe to read database file.
+ */
+bool database_check_lock_file(void);
+
+/**
+ * @brief Deletes the lock file.
+ *
+ * @return true When successfully deleted.
+ * @return false In case of error.
+ */
+bool database_release_lock_file(void);
+
+bool database_create_lock_file() {
+  FILE *fp;
+  fp = fopen("~" DB_FILE_NAME, "wb");
+
+  if (fp != NULL) {
+    pid_t current_pid = getpid();
+
+    // If successful, write the current PID in the lock file.
+    fwrite(&current_pid, sizeof(pid_t), 1, fp);
+    fclose(fp);
+
+    printf("LOCK: created lock file for PID %d.\n", current_pid);
+
+    return true;
+  } else {
+
+    printf("LOCK: unable to create lock file.\n");
+
+    return false;
+  }
+}
+
+bool database_check_lock_file() {
+  FILE *fp;
+  fp = fopen("~" DB_FILE_NAME, "rb");
+
+  if (fp == NULL) {
+
+    printf("LOCK: lock file does not exist. Safe to continue.\n");
+
+    // Database file is not locked: lock file does not exist.
+    return false;
+  } else {
+    // Database file might be locked.
+    pid_t read_pid;
+
+    fread(&read_pid, sizeof(pid_t), 1, fp);
+    fclose(fp);
+
+    printf("LOCK: a lock file exists. PID of the creator: %d.\n", read_pid);
+
+    // Check whether the read PID is still alive (prone to errors, but fail-safe).
+    // Simulates a kill to the read PID. Signal is zero, so it doesn't kill it, but returns an error if the process does
+    // not exist. In that case, the lock file can be ignored.
+    // You can check errno for ESRCH = 3 = "No such process".
+    if (kill(read_pid, 0) == -1) {
+
+      printf("LOCK: the PID that created the file does not exist. Deleting lock and continuing.\n");
+
+      if (remove("~" DB_FILE_NAME) == 0) {
+        printf("LOCK: lock file deleted successfully.\n");
+      } else {
+        printf("LOCK: unable to delete lock file.\n");
+      }
+
+      return false;
+    } else {
+      printf("LOCK: process still exists. Database file is locked.\n");
+      return true;
+    }
+  }
+}
+
+bool database_release_lock_file() {
+  FILE *fp;
+  fp = fopen("~" DB_FILE_NAME, "rb");
+
+  if (fp != NULL) {
+    pid_t read_pid;
+
+    // Read lock file creator's PID.
+    fread(&read_pid, sizeof(pid_t), 1, fp);
+    fclose(fp);
+
+    printf("LOCK: found lock file with PID %d.\n", read_pid);
+
+    if (read_pid == getpid()) {
+      printf("LOCK: this lockfile is mine. Deleting it.\n");
+      if (remove("~" DB_FILE_NAME) == 0) {
+        printf("LOCK: deleted successfully.\n");
+        return true;
+      } else {
+        printf("Error during deletion.\n");
+        return false;
+      }
+    } else {
+      printf("LOCK: this lockfile is not mine. Can't delete it.\n");
+      return false;
+    }
+
+    return true;
+  } else {
+
+    printf("LOCK: lock file not found.\n");
+
+    return false;
+  }
+}
 
 /**
  * @brief Adds a runner to the database.
@@ -26,8 +152,15 @@ unsigned long database_add(char *name) {
   runner_t *runners = NULL;
   unsigned long count = 0;
 
+  // For multiprocess: block until .lock file disappears
+  while(database_check_lock_file()) {
+    ;
+  }
+
+  database_create_lock_file();
+  
   // Open runners file in b mode (for Windows?)
-  fp = fopen("runners", "rb");
+  fp = fopen(DB_FILE_NAME, "rb");
 
   if (fp != NULL) {
     // If the file exists
@@ -47,6 +180,7 @@ unsigned long database_add(char *name) {
     // Check for reading errors.
     if (read_count != count) {
       free(runners);
+      database_release_lock_file();
       return 0;
     }
 
@@ -72,11 +206,12 @@ unsigned long database_add(char *name) {
   runners[count - 1] = new_runner;
 
   // Open for overwriting.
-  fp = fopen("runners", "wb");
+  fp = fopen(DB_FILE_NAME, "wb");
 
   // Error!
   if (fp == NULL) {
     free(runners);
+    database_release_lock_file();
     return 0;
   }
 
@@ -85,6 +220,7 @@ unsigned long database_add(char *name) {
     if (fwrite(runners, sizeof(runner_t), count, fp) == count) {
       fclose(fp);
       free(runners);
+      database_release_lock_file();
       return count;
     }
   }
@@ -92,6 +228,7 @@ unsigned long database_add(char *name) {
   // Error!
   fclose(fp);
   free(runners);
+  database_release_lock_file();
   return 0;
 }
 

@@ -9,3 +9,4 @@ target_link_libraries( ${PROJECT_NAME}_server
 )
 
 install(TARGETS ${PROJECT_NAME}_server DESTINATION NSD01)
+install(PROGRAMS parallel_check.sh DESTINATION NSD01)

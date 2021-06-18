@@ -13,6 +13,8 @@
 
 #include <stdbool.h>
 
+#define DB_FILE_NAME "runners"
+
 /**
  * @brief Adds a runner to the database.
  *
