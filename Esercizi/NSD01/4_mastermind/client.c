@@ -17,9 +17,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <liblog/log.h>
-#include <libmastermind/mastermind_solver.h>
-#include <libringbuffer/ring_buffer.h>
+#include <log/log.h>
+#include <mastermind/mastermind_solver.h>
+#include <ringbuffer/ring_buffer.h>
 #include <tcpsocketlib.h>
 
 /**
@@ -30,7 +30,18 @@
  * @param guess The guess output.
  * @return unsigned long The number of remaining guesses. 0 in case of error.
  */
-unsigned long send_new_guess(mm_game_t *game, int sk, unsigned char *guess) {
+static unsigned long send_new_guess(mm_game_t *game, int sk, unsigned char *guess);
+
+/**
+ * @brief Main loop.
+ *
+ * @param sk Socket handle.
+ * @param name Player name.
+ * @return int The number of tries. If something goes wrong, returns 0.
+ */
+static int mastermind_client_loop(int sk, char *name);
+
+static unsigned long send_new_guess(mm_game_t *game, int sk, unsigned char *guess) {
   unsigned long remaining_guesses;
   char send_buffer[256 + 1];
 
@@ -51,14 +62,7 @@ unsigned long send_new_guess(mm_game_t *game, int sk, unsigned char *guess) {
   return remaining_guesses;
 }
 
-/**
- * @brief Main loop.
- *
- * @param sk Socket handle.
- * @param name Player name.
- * @return int The number of tries. If something goes wrong, returns 0.
- */
-int mastermind_client_loop(int sk, char *name) {
+static int mastermind_client_loop(int sk, char *name) {
   ring_buffer_t *buffer;
   mm_game_t *game = mm_create_game();
 

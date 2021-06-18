@@ -18,7 +18,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <liblog/log.h>
+#include <log/log.h>
 #include <udpsocketlib.h>
 
 /**

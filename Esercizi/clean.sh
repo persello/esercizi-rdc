@@ -1,1 +1,1 @@
-rm -rf build/ output/
+rm -rf build/ output/ Xcode/

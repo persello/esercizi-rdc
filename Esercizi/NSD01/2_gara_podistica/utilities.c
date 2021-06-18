@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <stdnoreturn.h>
 
-#include <liblog/log.h>
+#include <log/log.h>
 #include <tcpsocketlib.h>
 
 /**

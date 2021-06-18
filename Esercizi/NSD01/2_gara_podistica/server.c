@@ -10,15 +10,15 @@
  */
 
 #include "constants.h"
-#include "database.h"
-#include "runner.h"
 #include "utilities.h"
 
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <liblog/log.h>
-#include <libringbuffer/ring_buffer.h>
+#include <log/log.h>
+#include <ringbuffer/ring_buffer.h>
+#include <runnerdb/database.h>
+#include <runnerdb/runner.h>
 #include <tcpsocketlib.h>
 
 int server_handler(int sk, char *ip_addr, int port) {

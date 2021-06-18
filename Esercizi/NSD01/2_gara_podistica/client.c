@@ -17,8 +17,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <liblog/log.h>
-#include <libringbuffer/ring_buffer.h>
+#include <log/log.h>
+#include <ringbuffer/ring_buffer.h>
 #include <tcpsocketlib.h>
 
 /**
