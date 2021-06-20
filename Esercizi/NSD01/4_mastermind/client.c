@@ -13,6 +13,7 @@
 #include "utilities.h"
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -49,8 +50,8 @@ static unsigned long send_new_guess(mm_game_t *game, int sk, unsigned char *gues
     LOG_WARNING("Tutti i possibili tentativi sono falliti.");
     return 0;
   } else {
-    LOG_INFO("Provo il codice %d%d%d%d, ci sono ancora %lu tentativi.", guess[0], guess[1],
-             guess[2], guess[3], remaining_guesses);
+    LOG_INFO("Provo il codice %d%d%d%d, ci sono ancora %lu tentativi.", guess[0], guess[1], guess[2], guess[3],
+             remaining_guesses);
   }
   sprintf(send_buffer, "myguess: %d%d%d%d\n", guess[0], guess[1], guess[2], guess[3]);
 

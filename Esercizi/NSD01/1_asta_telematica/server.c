@@ -13,6 +13,7 @@
 #include "server_utilities.h"
 #include "utilities.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
