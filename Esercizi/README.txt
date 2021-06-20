@@ -1,3 +1,5 @@
+--- FILE E LIBRERIE ---
+
 lib/              -> Contiene le librerie (sia quelle fornite dal docente, che altre, sviluppate per questi esercizi).
 .../log           -> Libreria di logging con 3 livelli di dettaglio.
 .../mastermind    -> Libreria per la risoluzione del gioco "Mastermind" secondo l'algoritmo di Knuth (adattato per funzionare in qualsiasi base e dimensione).
@@ -6,15 +8,17 @@ lib/              -> Contiene le librerie (sia quelle fornite dal docente, che a
 
 output/parallel_check.sh      -> Script per effettuare 100 richieste di iscrizione alla gara podistica praticamente contemporanee.
 
---- NOTE ---
-
-I programmi sono stati testati su macOS 11.4 con i seguenti compilatori:
-  - Clang 12.0.5  arm64-apple-darwin20.5.0                     (nessun warning, -Weverything -Wno-documentation-unknown-command -Wno-padded -Wno-unused-macros)
-  - Clang 12.0.5  x86_64-apple-darwin20.5.0  (Rosetta)         (nessun warning, -Weverything -Wno-documentation-unknown-command -Wno-padded -Wno-unused-macros)
-  - GCC   11.1.0  aarch64-apple-darwin10                       (nessun warning, -Wall -Wpedantic -Wextra -Wno-unknown-pragmas -Wno-padded -Wno-unused-macros)
+--- COMPATIBILITÀ ---
 
 I programmi sono stati testati su Linux Ubuntu 20.04.2.0 LTS (ARMv8/AArch64) con i seguenti compilatori:
-  - GCC   9.3.0   aarch64-linux-gnu                            (1 warning, -Wall -Wpedantic -Wextra -Wno-unknown-pragmas -Wno-padded -Wno-unused-macros)
+  - GCC     9.3.0  aarch64-linux-gnu                            (1 warning, -Wall -Wpedantic -Wextra -Wno-unknown-pragmas -Wno-padded -Wno-unused-macros)
+
+(Testato su una macchina virtuale appena creata, su cui sono stati installati solo Git e CMake (con le relative dipendenze) mediante il comando `sudo apt install git cmake`).
+
+I programmi sono stati testati su macOS 11.4 con i seguenti compilatori:
+  - Clang  12.0.5  arm64-apple-darwin20.5.0                     (nessun warning, -Weverything -Wno-documentation-unknown-command -Wno-padded -Wno-unused-macros)
+  - Clang  12.0.5  x86_64-apple-darwin20.5.0  (Rosetta)         (nessun warning, -Weverything -Wno-documentation-unknown-command -Wno-padded -Wno-unused-macros)
+  - GCC    11.1.0  aarch64-apple-darwin20                       (nessun warning, -Wall -Wpedantic -Wextra -Wno-unknown-pragmas -Wno-padded -Wno-unused-macros)
 
 --- COMPILAZIONE ---
 
@@ -29,8 +33,7 @@ make install
 
 Oppure usando lo script `build.sh`.
 
-I binari risultanti verranno installati nella cartella Esercizi/output,
-suddivisi per esercizio.
+I binari risultanti verranno installati nella cartella Esercizi/output.
 
 --- --- --- --- --- --- --- --- --- --- ---
 
