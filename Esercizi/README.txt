@@ -2,7 +2,7 @@ lib/              -> Contiene le librerie (sia quelle fornite dal docente, che a
 .../log           -> Libreria di logging con 3 livelli di dettaglio.
 .../mastermind    -> Libreria per la risoluzione del gioco "Mastermind" secondo l'algoritmo di Knuth (adattato per funzionare in qualsiasi base e dimensione).
 .../ringbuffer    -> Libreria per la creazione semplice di buffer circolari, usata per la ricezione di messaggi TCP. Utile per riassemblarli fino a formare una riga completa. Libreria recuperata da altri progetti personali in ambito embedded.
-.../*socket       -> Librerie fornite dal docente, opportunamente modificate per funzionare con CMake. Aggiunti alcuni cast per evitare warning.
+.../*socket       -> Librerie fornite dal docente, opportunamente modificate per funzionare con CMake. Aggiunti alcuni cast espliciti per evitare warning, senza modificarne il funzionamento.
 
 output/parallel_check.sh      -> Script per effettuare 100 richieste di iscrizione alla gara podistica praticamente contemporanee.
 
