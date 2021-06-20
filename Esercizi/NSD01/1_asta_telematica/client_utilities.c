@@ -12,6 +12,8 @@
 #include "client_utilities.h"
 #include "constants.h"
 
+#include <stdio.h>
+
 #include <log/log.h>
 #include <udpsocketlib.h>
 
