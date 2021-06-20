@@ -280,4 +280,7 @@ int main(int argc, char *argv[]) {
 }
 
 // Otherwise the compiler cries.
-int server_handler() { return 0; }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+int server_handler(int sk, char *ip_addr, int port) { return 0; }
+#pragma GCC diagnostic pop

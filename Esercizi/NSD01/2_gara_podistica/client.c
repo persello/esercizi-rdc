@@ -159,6 +159,7 @@ unsigned long add_runner(int sk, char *name) {
   }
 
   // Executed only on unexpected disconnections.
+  LOG_WARNING("Chiusura inattesa della connessione da parte del server.");
   ring_buffer_delete(buffer);
   return 0;
 }
@@ -278,7 +279,7 @@ int main(int argc, char *argv[]) {
     LOG_ERROR("Errore di connessione.");
     exit(EXIT_FAILURE);
   }
-  
+
   // If a name has been specified, call the function that adds a runner to the DB. Print the received number.
   if (strlen(name) > 0) {
     unsigned long number;
@@ -305,4 +306,7 @@ int main(int argc, char *argv[]) {
 }
 
 // Otherwise the compiler cries.
-int server_handler() { return 0; }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+int server_handler(int sk, char *ip_addr, int port) { return 0; }
+#pragma GCC diagnostic pop

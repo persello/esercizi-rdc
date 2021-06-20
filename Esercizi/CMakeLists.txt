@@ -8,7 +8,7 @@ set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-add_compile_options(-Wall -Wpedantic -Wextra)
+add_compile_options(-Wall -Wpedantic -Wextra -Wno-unknown-pragmas)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 add_compile_options(-Weverything -Wno-documentation-unknown-command)
 endif()

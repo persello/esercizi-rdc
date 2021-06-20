@@ -108,6 +108,8 @@ void child_server_loop(int sk, char *ip_addr, int port) {
           LOG_INFO("Richiesta iscrizione per %s.", name);
           unsigned long number = database_add(name);
 
+          LOG_INFO("Ottenuto numero di pettorale %lu dal database.", number);
+
           if (number == 0) {
             tcp_send(sk, "Errore durante l'aggiunta al database.\n");
           } else {
