@@ -119,22 +119,25 @@ mm_guess_result_t mm_compute_hypothetical_result(unsigned char *target, unsigned
   result.positions = 0;
   result.values = 0;
 
-  bool already_considered[MM_CODE_LENGTH] = {0};
+  bool already_considered_in_guess[MM_CODE_LENGTH] = {0};
+  bool already_considered_in_target[MM_CODE_LENGTH] = {0};
 
   // First pass: compute right positions
   for (int i = 0; i < MM_CODE_LENGTH; i++) {
     if (target[i] == guess[i]) {
       result.positions++;
-      already_considered[i] = true;
+      already_considered_in_guess[i] = true;
+      already_considered_in_target[i] = true;
     }
   }
 
   // Second pass: ignore right positions, search for correct values
   for (int i = 0; i < MM_CODE_LENGTH; i++) {
     for (int j = 0; j < MM_CODE_LENGTH; j++) {
-      if ((!already_considered[i] || !already_considered[j]) && target[j] == guess[i]) {
+      if ((!already_considered_in_guess[i] && !already_considered_in_target[j]) && target[j] == guess[i]) {
         result.values++;
-        already_considered[j] = true;
+        already_considered_in_guess[i] = true;
+        already_considered_in_target[j] = true;
       }
     }
   }
