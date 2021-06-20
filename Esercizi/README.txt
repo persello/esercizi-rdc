@@ -14,7 +14,7 @@ I programmi sono stati testati su macOS 11.4 con i seguenti compilatori:
   - GCC   11.1.0  aarch64-apple-darwin10                       (nessun warning, -Wall -Wpedantic -Wextra -Wno-unknown-pragmas -Wno-padded -Wno-unused-macros)
 
 I programmi sono stati testati su Linux Ubuntu 20.04.2.0 LTS (ARMv8/AArch64) con i seguenti compilatori:
-  - DA TESTARE PRIMA DELLA CONSEGNA!!!
+  - GCC   9.3.0   aarch64-linux-gnu                            (1 warning, -Wall -Wpedantic -Wextra -Wno-unknown-pragmas -Wno-padded -Wno-unused-macros)
 
 --- COMPILAZIONE ---
 

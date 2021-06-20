@@ -132,7 +132,7 @@ mm_guess_result_t mm_compute_hypothetical_result(unsigned char *target, unsigned
   // Second pass: ignore right positions, search for correct values
   for (int i = 0; i < MM_CODE_LENGTH; i++) {
     for (int j = 0; j < MM_CODE_LENGTH; j++) {
-      if ((!already_considered[i] && !already_considered[j]) && target[j] == guess[i]) {
+      if ((!already_considered[i] || !already_considered[j]) && target[j] == guess[i]) {
         result.values++;
         already_considered[j] = true;
       }
