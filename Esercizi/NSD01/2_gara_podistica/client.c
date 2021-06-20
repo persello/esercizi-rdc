@@ -69,7 +69,7 @@ void print_participants_list(int sk) {
   // Two times the single buffer's size.
   buffer = ring_buffer_create(BUFSIZ * 2);
 
-  // Temporary buffer for a single TCP segment.
+  // Temporary buffer for read.
   char temp[BUFSIZ + 1];
 
   // A complete block (until \n).
@@ -117,7 +117,7 @@ unsigned long add_runner(int sk, char *name) {
   // Two times the single buffer's size.
   buffer = ring_buffer_create(BUFSIZ * 2);
 
-  // Temporary buffer for a single TCP segment.
+  // Temporary buffer for read.
   char temp[BUFSIZ + 1];
 
   // A complete line (block, command?), up to \n.

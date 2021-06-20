@@ -32,4 +32,7 @@ void try_reply(int socket_handle, char *message);
  * @return true If the command was parsed correcty.
  * @return false If the command wasn't parsed correctly.
  */
+
+#pragma once
+
 bool parse_command(char *command, char *name, double *value);

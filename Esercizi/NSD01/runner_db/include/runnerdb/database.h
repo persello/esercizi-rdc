@@ -9,6 +9,8 @@
  *
  */
 
+#pragma once
+
 #include "runner.h"
 
 #include <stdbool.h>

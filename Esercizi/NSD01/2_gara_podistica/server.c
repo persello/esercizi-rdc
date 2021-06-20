@@ -28,7 +28,7 @@ int server_handler(int sk, char *ip_addr, int port) {
 
   LOG_INFO("Connessione aperta con %s, porta %d.", ip_addr, port);
 
-  // Could contain two maximum-size segments.
+  // Could contain two maximum-size reads.
   buffer = ring_buffer_create(BUFSIZ * 2);
 
   while (tcp_receive(sk, received)) {
@@ -76,12 +76,11 @@ int server_handler(int sk, char *ip_addr, int port) {
             tcp_send(sk, current_line);
           }
           tcp_send(sk, ".\n");
+          free(runners);
         } else {
           LOG_INFO("Lista partecipanti vuota.");
-          tcp_send(sk, "Lista vuota.\n");
+          tcp_send(sk, "Lista vuota.\n.\n");
         }
-
-        free(runners);
 
       } else if (strncmp(command, "ISCRIVI ", 8) == 0) {
 

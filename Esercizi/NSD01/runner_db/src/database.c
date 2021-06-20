@@ -43,34 +43,34 @@ bool database_check_lock_file(void);
 bool database_release_lock_file(void);
 
 bool database_create_lock_file() {
+  pid_t current_pid = getpid();
   FILE *fp;
   fp = fopen("~" DB_FILE_NAME, "wb");
 
   if (fp != NULL) {
-    pid_t current_pid = getpid();
 
     // If successful, write the current PID in the lock file.
     fwrite(&current_pid, sizeof(pid_t), 1, fp);
     fclose(fp);
 
-    printf("LOCK: created lock file for PID %d.\n", current_pid);
+    printf("[LOCK] (%d) created lock file.\n", current_pid);
 
     return true;
   } else {
 
-    printf("LOCK: unable to create lock file.\n");
-
+    printf("[LOCK] (%d) unable to create lock file.\n", current_pid);
     return false;
   }
 }
 
 bool database_check_lock_file() {
+  pid_t current_pid = getpid();
   FILE *fp;
   fp = fopen("~" DB_FILE_NAME, "rb");
 
   if (fp == NULL) {
 
-    printf("LOCK: lock file does not exist. Safe to continue.\n");
+    printf("[LOCK] (%d) lock file does not exist. Safe to continue.\n", current_pid);
 
     // Database file is not locked: lock file does not exist.
     return false;
@@ -81,7 +81,7 @@ bool database_check_lock_file() {
     fread(&read_pid, sizeof(pid_t), 1, fp);
     fclose(fp);
 
-    printf("LOCK: a lock file exists. PID of the creator: %d.\n", read_pid);
+    printf("[LOCK] (%d) a lock file exists. PID of the creator: %d.\n", current_pid, read_pid);
 
     // Check whether the read PID is still alive (prone to errors, but fail-safe).
     // Simulates a kill to the read PID. Signal is zero, so it doesn't kill it, but returns an error if the process does
@@ -89,23 +89,26 @@ bool database_check_lock_file() {
     // You can check errno for ESRCH = 3 = "No such process".
     if (kill(read_pid, 0) == -1) {
 
-      printf("LOCK: the PID that created the file does not exist. Deleting lock and continuing.\n");
+      printf(
+          "[LOCK] (%d) the process whith the PID that created the file does not exist. Deleting lock and continuing.\n",
+          current_pid);
 
       if (remove("~" DB_FILE_NAME) == 0) {
-        printf("LOCK: lock file deleted successfully.\n");
+        printf("[LOCK] (%d) lock file deleted successfully.\n", current_pid);
       } else {
-        printf("LOCK: unable to delete lock file.\n");
+        printf("[LOCK] (%d) unable to delete lock file.\n", current_pid);
       }
 
       return false;
     } else {
-      printf("LOCK: process still exists. Database file is locked.\n");
+      printf("[LOCK] (%d) process still exists. Database file is locked.\n", current_pid);
       return true;
     }
   }
 }
 
 bool database_release_lock_file() {
+  pid_t current_pid = getpid();
   FILE *fp;
   fp = fopen("~" DB_FILE_NAME, "rb");
 
@@ -116,26 +119,26 @@ bool database_release_lock_file() {
     fread(&read_pid, sizeof(pid_t), 1, fp);
     fclose(fp);
 
-    printf("LOCK: found lock file with PID %d.\n", read_pid);
+    printf("[LOCK] (%d) found lock file with PID %d.\n", current_pid, read_pid);
 
-    if (read_pid == getpid()) {
-      printf("LOCK: this lockfile is mine. Deleting it.\n");
+    if (read_pid == current_pid) {
+      printf("[LOCK] (%d) this lockfile is mine. Deleting it.\n", current_pid);
       if (remove("~" DB_FILE_NAME) == 0) {
-        printf("LOCK: deleted successfully.\n");
+        printf("[LOCK] (%d) deleted successfully.\n", current_pid);
         return true;
       } else {
-        printf("Error during deletion.\n");
+        printf("[LOCK] (%d) Error during deletion.\n", current_pid);
         return false;
       }
     } else {
-      printf("LOCK: this lockfile is not mine. Can't delete it.\n");
+      printf("[LOCK] (%d) this lockfile is not mine. Can't delete it.\n", current_pid);
       return false;
     }
 
     return true;
   } else {
 
-    printf("LOCK: lock file not found.\n");
+    printf("[LOCK] (%d) lock file not found.\n", current_pid);
 
     return false;
   }
@@ -153,12 +156,12 @@ unsigned long database_add(char *name) {
   unsigned long count = 0;
 
   // For multiprocess: block until .lock file disappears
-  while(database_check_lock_file()) {
-    ;
+  while (database_check_lock_file()) {
+    sleep(1);
   }
 
   database_create_lock_file();
-  
+
   // Open runners file in b mode (for Windows?)
   fp = fopen(DB_FILE_NAME, "rb");
 
@@ -242,6 +245,12 @@ unsigned long database_get_all(runner_t **runners) {
   FILE *fp;
   unsigned long count = 0;
 
+  while (database_check_lock_file()) {
+    sleep(1);
+  }
+
+  database_create_lock_file();
+
   fp = fopen("runners", "rb");
 
   if (fp != NULL) {
@@ -253,12 +262,16 @@ unsigned long database_get_all(runner_t **runners) {
     fclose(fp);
 
     if (read_count != count) {
+      database_release_lock_file();
       return 0;
     }
+
+    database_release_lock_file();
 
     return count;
   } else {
 
+    database_release_lock_file();
     return 0;
   }
 }
