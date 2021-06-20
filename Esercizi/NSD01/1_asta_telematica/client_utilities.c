@@ -12,6 +12,7 @@
 #include "client_utilities.h"
 #include "constants.h"
 
+#define _GNU_SOURCE
 #include <stdio.h>
 
 #include <log/log.h>
