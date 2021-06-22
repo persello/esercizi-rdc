@@ -1,4 +1,4 @@
-PDFs = NA01.pdf NA02.pdf NA03.pdf NSD01.pdf
+PDFs = NA01.pdf NA02.pdf NA03.pdf NA04.pdf NSD01.pdf
 TARGETS = $(PDFs)
 
 .PHONY: all clean

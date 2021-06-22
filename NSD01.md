@@ -10,7 +10,7 @@ header-includes:
 ---
 
 Il codice sorgente degli esercizi si trova nella cartella `Esercizi/NSD01`.
-Gli esercizi vengono compilati mediante il comando `cmake`. Fare riferimento al README.
+Gli esercizi vengono compilati mediante il comando `cmake`. Fare riferimento al README di quella cartella.
 
 \footnotesize
 La sorgente del documento è disponibile al seguente indirizzo: [https://github.com/persello/esercizi-rdc](https://github.com/persello/esercizi-rdc). Documento generato con [pandoc](https://pandoc.org).
